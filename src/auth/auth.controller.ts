@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   InternalServerErrorException,
   Post,
   Req,
@@ -12,6 +13,8 @@ import { Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { SignUpDto } from './dto/signUp.dto';
+import {  } from './dto/signIn.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +25,7 @@ export class AuthController {
 
   @Public()
   @Post('sign-up')
-  async signUp(@Body() signUpDto) {
+  async signUp(@Body() signUpDto: SignUpDto) {
     try {
       const { username, password } = signUpDto;
       const user = await this.usersService.findByUsername(username);
@@ -38,7 +41,7 @@ export class AuthController {
 
   @Public()
   @Post('sign-in')
-  async signIn(@Body() signInDto, @Res() res: Response) {
+  async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
     try {
       const { username, password } = signInDto;
       const { access_token, refresh_token } = await this.authService.signIn(username, password);
@@ -51,7 +54,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('refresh')
+  @Get('refresh')
   async refresh(@Req() req) {
     const refreshToken = req.cookies['refreshToken'];
 
