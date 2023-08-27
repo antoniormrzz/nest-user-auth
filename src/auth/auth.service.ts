@@ -28,8 +28,8 @@ export class AuthService {
   async refresh(refreshToken: string) {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
-      const accessToken = await this.jwtService.signAsync(payload);
-      return { accessToken };
+      const access_token = await this.jwtService.signAsync(payload);
+      return { access_token };
     } catch {
       throw new UnauthorizedException();
     }

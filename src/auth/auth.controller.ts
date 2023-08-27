@@ -14,7 +14,7 @@ import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { SignUpDto } from './dto/signUp.dto';
-import {  } from './dto/signIn.dto';
+import { SignInDto } from './dto/signIn.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +35,11 @@ export class AuthController {
       await this.usersService.create({ username, password });
       return 'User created';
     } catch (error) {
-      throw new InternalServerErrorException('database error');
+      if (error instanceof BadRequestException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('database error');
+      }
     }
   }
 
@@ -46,7 +50,7 @@ export class AuthController {
       const { username, password } = signInDto;
       const { access_token, refresh_token } = await this.authService.signIn(username, password);
       // We're setting the cookie with the refresh token here
-      res.cookie('refreshToken', refresh_token, { httpOnly: true });
+      res.cookie('refresh_token', refresh_token, { httpOnly: true });
       return { access_token };
     } catch (error) {
       throw new UnauthorizedException('Username or password incorrect');
@@ -56,7 +60,7 @@ export class AuthController {
   @Public()
   @Get('refresh')
   async refresh(@Req() req) {
-    const refreshToken = req.cookies['refreshToken'];
+    const refreshToken = req.cookies['refresh_token'];
 
     if (!refreshToken) {
       throw new UnauthorizedException();
